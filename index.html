@@ -718,7 +718,10 @@
 </div>
 
 <script>
-  // *** สำคัญมาก: ใส่ URL เว็บแอปของคุณที่ได้จากการ Deploy ลงในเครื่องหมายคำพูดด้านล่างนี้ ***
+  // =====================================================================================
+  // *** สำคัญที่สุด: นำ URL ของ Web App จาก Google Apps Script มาใส่ตรงนี้ ***
+  // ตัวอย่างเช่น: 'https://script.google.com/macros/s/AKfycbzKIoms1ZoyNw9RasgJ6wBoIhLS5T3ceqh56gv4T_w_VPIvcBqLlYaYLAj8kydwKLr2/exec'
+  // =====================================================================================
   const API_URL = 'ใส่_URL_WEB_APP_ของคุณที่นี่';
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -753,8 +756,14 @@
       return;
     }
 
-    if(API_URL === 'https://script.google.com/macros/s/AKfycbwqc3DdqWhdnP6-_JVGny8cp0Ps8wf5tsBGArCuxAnZyxtjjrAx3NUVhYveORTo2q9uhg/exec') {
-      showError('ยังไม่ได้ตั้งค่า API_URL ในโค้ด JavaScript กรุณาใส่ URL ของ Web App ก่อนครับ');
+    // ตัวดักจับ Error ที่เพิ่มให้ใหม่ เพื่อเตือนกรณีลืมเปลี่ยน URL 
+    if (!API_URL || !API_URL.startsWith('https://script.google.com/')) {
+      Swal.fire({
+        icon: 'error',
+        title: 'ตั้งค่า URL ผิดพลาด',
+        text: 'รบกวนตรวจสอบบรรทัด const API_URL ในโค้ดอีกครั้งครับ คุณต้องนำลิงก์ Web App ของ Google มาใส่แทนที่ข้อความเดิม (ลิงก์ต้องขึ้นต้นด้วย https://script.google.com/...)',
+        confirmButtonColor: '#b91c1c'
+      });
       return;
     }
 
@@ -763,12 +772,18 @@
     btn.innerHTML = 'กำลังค้นหา...';
     btn.disabled = true;
 
-    // ลบ headers ออกทั้งหมดเพื่อป้องกัน Preflight Request
+    // ตั้งค่า Headers เพื่อส่งข้อมูลแบบข้อความธรรมดา (ป้องกัน CORS)
     fetch(API_URL, {
       method: 'POST',
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
       body: JSON.stringify({ action: 'verify', empId: empId })
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) throw new Error('การเชื่อมต่อกับเซิร์ฟเวอร์ล้มเหลว (Status: ' + response.status + ')');
+      return response.json();
+    })
     .then(data => {
       if (data.status === 'success' && data.data) {
         document.querySelector('input[name="empName"]').value = data.data.empName;
@@ -821,8 +836,14 @@
       return;
     }
 
-    if(API_URL === 'ใส่_URL_WEB_APP_ของคุณที่นี่') {
-      showError('ยังไม่ได้ตั้งค่า API_URL ในโค้ด JavaScript กรุณาใส่ URL ของ Web App ก่อนครับ');
+    // ตัวดักจับ Error ที่เพิ่มให้ใหม่ เพื่อเตือนกรณีลืมเปลี่ยน URL
+    if (!API_URL || !API_URL.startsWith('https://script.google.com/')) {
+      Swal.fire({
+        icon: 'error',
+        title: 'ตั้งค่า URL ผิดพลาด',
+        text: 'รบกวนตรวจสอบบรรทัด const API_URL ในโค้ดอีกครั้งครับ คุณต้องนำลิงก์ Web App ของ Google มาใส่แทนที่ข้อความเดิม (ลิงก์ต้องขึ้นต้นด้วย https://script.google.com/...)',
+        confirmButtonColor: '#b91c1c'
+      });
       btn.innerHTML = 'บันทึกข้อมูล';
       btn.disabled = false;
       return;
@@ -894,12 +915,17 @@
       nextTraining: nextTrainingValue
     };
     
-    // ลบ headers ออกทั้งหมดเพื่อป้องกัน Preflight Request
     fetch(API_URL, {
       method: 'POST',
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
       body: JSON.stringify({ action: 'save', formData: formData })
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) throw new Error('การเชื่อมต่อกับเซิร์ฟเวอร์ล้มเหลว (Status: ' + response.status + ')');
+      return response.json();
+    })
     .then(data => {
       if (data.status === 'success') {
         Swal.fire({
