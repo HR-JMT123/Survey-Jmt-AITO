@@ -294,6 +294,16 @@
       animation: fadeInDown 0.5s ease-out forwards;
     }
 
+    /* กล่องข้อมูลย่อย (Pre-AI) */
+    .sub-group-box {
+      background-color: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 15px;
+      margin-bottom: 28px;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px; 
@@ -359,6 +369,9 @@
         padding: 14px; 
         margin-top: 10px; 
       }
+      .sub-group-box {
+        padding: 15px;
+      }
     }
   </style>
 </head>
@@ -408,8 +421,40 @@
 
       <div class="section-title">ส่วนที่ 2: ประสบการณ์และความรู้</div>
 
+      <!-- เพิ่มคำถามเรื่องการใช้งาน AI ก่อนอบรม -->
+      <div class="form-group" style="margin-bottom: 10px;">
+        <label>ท่านเคยใช้งาน AI เพื่อช่วยในการทำงาน (ก่อนเข้าอบรม) หรือไม่? <span class="required">*</span></label>
+        <div class="radio-pill-group">
+          <label><input type="radio" name="preAiUsage" value="เคยใช้งาน" required onchange="togglePreAiFields(true)"> เคยใช้งาน</label>
+          <label><input type="radio" name="preAiUsage" value="ไม่เคยใช้งาน" onchange="togglePreAiFields(false)"> ไม่เคยใช้งาน</label>
+        </div>
+      </div>
+
+      <!-- ส่วนที่จะซ่อน/แสดงขึ้นอยู่กับคำตอบด้านบน -->
+      <div id="preAiDetails" class="sub-group-box" style="display: none;">
+        <div class="form-group">
+          <label>ใช้งานเครื่องมือ AI ใดอยู่บ้าง? <span class="required">*</span></label>
+          <input type="text" name="preAiTools" placeholder="เช่น ChatGPT, Gemini, Claude, Canva เป็นต้น">
+        </div>
+        
+        <div class="form-group">
+          <label>ท่านนำ AI ไปใช้ช่วยในลักษณะงานใดบ้าง? <span class="required">*</span></label>
+          <input type="text" name="preAiTasks" placeholder="เช่น ร่างอีเมล, สรุปการประชุม, แปลภาษา เป็นต้น">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>ความถี่ในการใช้งาน AI (ก่อนเข้าอบรม) บ่อยเพียงใด? <span class="required">*</span></label>
+          <div class="radio-pill-group">
+            <label><input type="radio" name="preAiFreq" value="ใช้งานทุกวัน"> ใช้งานทุกวัน</label>
+            <label><input type="radio" name="preAiFreq" value="2-3 ครั้ง/สัปดาห์"> 2-3 ครั้ง/สัปดาห์</label>
+            <label><input type="radio" name="preAiFreq" value="นานๆ ครั้ง"> นานๆ ครั้ง</label>
+          </div>
+        </div>
+      </div>
+      <!-- จบส่วนคำถามใหม่ -->
+
       <div class="form-group">
-        <label>คาดว่าจะนำ AI ไปใช้งานในการทำงานบ่อยเพียงใด (หลังอบรม) <span class="required">*</span></label>
+        <label>คาดว่าจะนำ AI ไปใช้งานในการทำงานบ่อยเพียงใด (หลังเข้าอบรม) <span class="required">*</span></label>
         <div class="radio-pill-group">
           <label><input type="radio" name="aiUsage" value="ใช้งานทุกวัน" required> ใช้งานทุกวัน</label>
           <label><input type="radio" name="aiUsage" value="2-3 ครั้ง/สัปดาห์"> 2-3 ครั้ง/สัปดาห์</label>
@@ -720,9 +765,8 @@
 <script>
   // =====================================================================================
   // *** สำคัญที่สุด: นำ URL ของ Web App จาก Google Apps Script มาใส่ตรงนี้ ***
-  // ตัวอย่างเช่น: 'https://script.google.com/macros/s/AKfycbzKIoms1ZoyNw9RasgJ6wBoIhLS5T3ceqh56gv4T_w_VPIvcBqLlYaYLAj8kydwKLr2/exec'
   // =====================================================================================
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzKIoms1ZoyNw9RasgJ6wBoIhLS5T3ceqh56gv4T_w_VPIvcBqLlYaYLAj8kydwKLr2/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzoxQAt_JVUWUAZY3os8gaZ0BX2enplFXvGvDkeBweNgWw7Exuzeak2VRvWd4UW9-6R2Q/exec';
 
   document.addEventListener('DOMContentLoaded', function() {
     const favoriteAiRadios = document.querySelectorAll('input[name="favoriteAi"]');
@@ -743,6 +787,31 @@
     });
   });
 
+  // ฟังก์ชันสลับแสดง/ซ่อน คำถามส่วนย่อยของการใช้ AI ก่อนเข้าอบรม
+  function togglePreAiFields(show) {
+    const detailsDiv = document.getElementById('preAiDetails');
+    const toolsInput = document.querySelector('input[name="preAiTools"]');
+    const tasksInput = document.querySelector('input[name="preAiTasks"]');
+    const freqRadios = document.querySelectorAll('input[name="preAiFreq"]');
+    
+    if (show) {
+      detailsDiv.style.display = 'block';
+      toolsInput.required = true;
+      tasksInput.required = true;
+      freqRadios[0].required = true;
+    } else {
+      detailsDiv.style.display = 'none';
+      toolsInput.required = false;
+      tasksInput.required = false;
+      freqRadios[0].required = false;
+      
+      // ล้างค่าข้อมูลกรณีผู้ใช้เปลี่ยนใจเลือกไม่เคยใช้งาน
+      toolsInput.value = '';
+      tasksInput.value = '';
+      freqRadios.forEach(r => r.checked = false);
+    }
+  }
+
   function verifyEmployeeId() {
     const empId = document.getElementById('empIdInput').value.trim();
     
@@ -756,12 +825,11 @@
       return;
     }
 
-    // ตัวดักจับ Error ที่เพิ่มให้ใหม่ เพื่อเตือนกรณีลืมเปลี่ยน URL 
     if (!API_URL || !API_URL.startsWith('https://script.google.com/')) {
       Swal.fire({
         icon: 'error',
         title: 'ตั้งค่า URL ผิดพลาด',
-        text: 'รบกวนตรวจสอบบรรทัด const API_URL ในโค้ดอีกครั้งครับ คุณต้องนำลิงก์ Web App ของ Google มาใส่แทนที่ข้อความเดิม (ลิงก์ต้องขึ้นต้นด้วย https://script.google.com/...)',
+        text: 'รบกวนตรวจสอบบรรทัด const API_URL ในโค้ดอีกครั้งครับ',
         confirmButtonColor: '#b91c1c'
       });
       return;
@@ -772,7 +840,6 @@
     btn.innerHTML = 'กำลังค้นหา...';
     btn.disabled = true;
 
-    // ตั้งค่า Headers เพื่อส่งข้อมูลแบบข้อความธรรมดา (ป้องกัน CORS)
     fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -836,12 +903,11 @@
       return;
     }
 
-    // ตัวดักจับ Error ที่เพิ่มให้ใหม่ เพื่อเตือนกรณีลืมเปลี่ยน URL
     if (!API_URL || !API_URL.startsWith('https://script.google.com/')) {
       Swal.fire({
         icon: 'error',
         title: 'ตั้งค่า URL ผิดพลาด',
-        text: 'รบกวนตรวจสอบบรรทัด const API_URL ในโค้ดอีกครั้งครับ คุณต้องนำลิงก์ Web App ของ Google มาใส่แทนที่ข้อความเดิม (ลิงก์ต้องขึ้นต้นด้วย https://script.google.com/...)',
+        text: 'รบกวนตรวจสอบบรรทัด const API_URL ในโค้ดอีกครั้งครับ',
         confirmButtonColor: '#b91c1c'
       });
       btn.innerHTML = 'บันทึกข้อมูล';
@@ -849,18 +915,32 @@
       return;
     }
 
+    // ดึงค่าการใช้งาน AI ก่อนอบรม
+    let preAiUsageValue = '';
+    if (form.preAiUsage) {
+      if (form.preAiUsage.length) {
+         for (let i = 0; i < form.preAiUsage.length; i++) {
+            if (form.preAiUsage[i].checked) { preAiUsageValue = form.preAiUsage[i].value; break; }
+         }
+      } else if (form.preAiUsage.checked) { preAiUsageValue = form.preAiUsage.value; }
+    }
+
+    let preAiFreqValue = '';
+    if (form.preAiFreq) {
+      if (form.preAiFreq.length) {
+         for (let i = 0; i < form.preAiFreq.length; i++) {
+            if (form.preAiFreq[i].checked) { preAiFreqValue = form.preAiFreq[i].value; break; }
+         }
+      } else if (form.preAiFreq.checked) { preAiFreqValue = form.preAiFreq.value; }
+    }
+
     let nextTrainingValue = '';
     if (form.nextTraining) {
       if (form.nextTraining.length) {
          for (let i = 0; i < form.nextTraining.length; i++) {
-            if (form.nextTraining[i].checked) {
-               nextTrainingValue = form.nextTraining[i].value;
-               break;
-            }
+            if (form.nextTraining[i].checked) { nextTrainingValue = form.nextTraining[i].value; break; }
          }
-      } else if (form.nextTraining.checked) {
-         nextTrainingValue = form.nextTraining.value;
-      }
+      } else if (form.nextTraining.checked) { nextTrainingValue = form.nextTraining.value; }
     }
 
     let favoriteAiValue = '';
@@ -887,6 +967,10 @@
       department: form.department.value,
       company: form.company.value,
       branch: form.branch.value,
+      preAiUsage: preAiUsageValue,
+      preAiTools: form.preAiTools.value,
+      preAiTasks: form.preAiTasks.value,
+      preAiFreq: preAiFreqValue,
       aiUsage: form.aiUsage.value,
       rate1_1: form.rate1_1.value,
       rate1_2: form.rate1_2.value,
@@ -939,6 +1023,7 @@
           document.getElementById('otherAiText').required = false;
           document.getElementById('userInfoFields').style.display = 'none';
           document.getElementById('verifyBtn').innerHTML = 'ตรวจสอบ';
+          togglePreAiFields(false); // ซ่อนกล่องข้อมูลก่อนอบรม
 
           btn.innerHTML = 'บันทึกข้อมูล';
           btn.disabled = false;
