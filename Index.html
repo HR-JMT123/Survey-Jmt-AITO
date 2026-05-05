@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>แบบสำรวจหลังการอบรม</title>
+  <title>JMT AITO BOOT CAMP</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
@@ -294,7 +294,6 @@
       animation: fadeInDown 0.5s ease-out forwards;
     }
 
-    /* 📱 การปรับแต่งสำหรับจอขนาดเล็ก (Mobile Responsive) */
     @media (max-width: 600px) {
       body {
         padding: 10px; 
@@ -720,7 +719,7 @@
 
 <script>
   // *** สำคัญมาก: ใส่ URL เว็บแอปของคุณที่ได้จากการ Deploy ลงในเครื่องหมายคำพูดด้านล่างนี้ ***
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxHEO5iQk6oE1sGGxfOifww12lZwPc6l-LuyGPlvgSIqwwuNNyAj0JS5T9R0Xq0_Y2y6A/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyCPOdReGG7uRWOszmTBWSL3yMVGfBlCR7IdBFJBfSwP7GYql4vbAk3YlXBgBORrDs7XA/exec';
 
   document.addEventListener('DOMContentLoaded', function() {
     const favoriteAiRadios = document.querySelectorAll('input[name="favoriteAi"]');
@@ -764,13 +763,9 @@
     btn.innerHTML = 'กำลังค้นหา...';
     btn.disabled = true;
 
-    // แก้ไขเพิ่ม Headers และ redirect สำหรับการเชื่อมต่อแบบ POST เพื่อแก้ปัญหา CORS
+    // ลบ headers ออกทั้งหมดเพื่อป้องกัน Preflight Request
     fetch(API_URL, {
       method: 'POST',
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-      },
-      redirect: "follow",
       body: JSON.stringify({ action: 'verify', empId: empId })
     })
     .then(response => response.json())
@@ -899,13 +894,9 @@
       nextTraining: nextTrainingValue
     };
     
-    // แก้ไขเพิ่ม Headers และ redirect สำหรับการเชื่อมต่อแบบ POST เพื่อแก้ปัญหา CORS
+    // ลบ headers ออกทั้งหมดเพื่อป้องกัน Preflight Request
     fetch(API_URL, {
       method: 'POST',
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-      },
-      redirect: "follow",
       body: JSON.stringify({ action: 'save', formData: formData })
     })
     .then(response => response.json())
